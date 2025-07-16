@@ -1,0 +1,8 @@
+Department_ID,Department_Name,Head_Doctor,Location_ID,Emergency_Services
+D001,Cardiology,Thomas Gonzalez,L004,False
+D002,Orthopedics,Lauren Freeman,L005,True
+D003,Pediatrics,Julie Turner,L003,False
+D004,Neurology,Robert Bennett,L003,True
+D005,Oncology,Megan Carter,L004,False
+D006,Radiology,Sara Flores,L002,True
+D007,Surgery,Tiffany Johnson,L004,True

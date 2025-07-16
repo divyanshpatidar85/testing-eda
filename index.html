@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced EDA Tool - Data Analysis Made Easy</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      color: white;
+      animation: fadeInDown 1s ease;
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .upload-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      animation: fadeInUp 1s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .upload-area {
+      border: 3px dashed #667eea;
+      border-radius: 15px;
+      padding: 60px 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(45deg, #f8f9ff 0%, #e8f0ff 100%);
+    }
+
+    .upload-area:hover {
+      border-color: #764ba2;
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.2);
+    }
+
+    .upload-area.dragover {
+      border-color: #4caf50;
+      background: linear-gradient(45deg, #f0fff4 0%, #e8f8f0 100%);
+    }
+
+    .upload-icon {
+      font-size: 4rem;
+      color: #667eea;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .upload-area:hover .upload-icon {
+      transform: scale(1.1);
+    }
+
+    .file-input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .upload-text {
+      font-size: 1.2rem;
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .upload-hint {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .file-info {
+      background: #e8f0ff;
+      border: 1px solid #667eea;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .upload-btn {
+      background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      margin-top: 20px;
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .upload-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status-message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: 500;
+      text-align: center;
+      display: none;
+    }
+
+    .status-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status-loading {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
+    .results-section {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: none;
+      animation: fadeInUp 1s ease;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .results-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .eda-btn {
+      background: linear-gradient(45deg, #4caf50 0%, #45a049 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1rem;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      box-shadow: 0 8px 15px rgba(76, 175, 80, 0.3);
+    }
+
+    .eda-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(76, 175, 80, 0.4);
+    }
+
+    .eda-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .eda-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      border-left: 4px solid #667eea;
+    }
+
+    .eda-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
+      color: #667eea;
+    }
+
+    .shape-display {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #667eea;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(45deg, #f8f9ff 0%, #e8f0ff 100%);
+      border-radius: 10px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th {
+      background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px;
+      font-weight: 600;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.9rem;
+    }
+
+    tr:hover {
+      background: #f8f9ff;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .full-width-card {
+      grid-column: 1 / -1;
+    }
+
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #f0f0f0;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .clear-btn {
+      background: linear-gradient(45deg, #ff6b6b 0%, #ee5a52 100%);
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      font-size: 0.9rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .clear-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .upload-section,
+      .results-section {
+        padding: 20px;
+      }
+
+      .eda-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .results-header {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔍 Advanced EDA Tool</h1>
+      <p>Upload your CSV or Excel file and get comprehensive exploratory data analysis</p>
+    </div>
+
+    <div class="upload-section">
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">Drop your file here or click to browse</div>
+        <div class="upload-hint">Supports CSV, XLS, and XLSX files</div>
+        <input type="file" class="file-input" id="fileInput" accept=".csv,.xls,.xlsx" />
+      </div>
+
+      <div class="file-info" id="fileInfo">
+        <strong>Selected file:</strong> <span id="fileName"></span><br>
+        <strong>Size:</strong> <span id="fileSize"></span>
+      </div>
+
+      <div style="text-align: center;">
+        <button class="upload-btn" id="uploadBtn" disabled>
+          Upload & Process File
+        </button>
+      </div>
+
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <div class="results-section" id="resultsSection">
+      <div class="results-header">
+        <div class="results-title">📊 Analysis Results</div>
+        <div>
+          <button class="eda-btn" id="edaBtn">
+            <span class="loading-spinner" id="edaSpinner" style="display: none;"></span>
+            Run EDA Analysis
+          </button>
+          <button class="clear-btn" id="clearBtn">Clear Results</button>
+        </div>
+      </div>
+
+      <div class="eda-grid" id="edaGrid">
+        <!-- EDA results will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    class EDAAnalyzer {
+      constructor() {
+        this.initializeElements();
+        this.setupEventListeners();
+        this.uploadedFile = null;
+        this.edaResults = null;
+      }
+
+      initializeElements() {
+        this.uploadArea = document.getElementById('uploadArea');
+        this.fileInput = document.getElementById('fileInput');
+        this.fileInfo = document.getElementById('fileInfo');
+        this.fileName = document.getElementById('fileName');
+        this.fileSize = document.getElementById('fileSize');
+        this.uploadBtn = document.getElementById('uploadBtn');
+        this.progressBar = document.getElementById('progressBar');
+        this.progressFill = document.getElementById('progressFill');
+        this.statusMessage = document.getElementById('statusMessage');
+        this.resultsSection = document.getElementById('resultsSection');
+        this.edaBtn = document.getElementById('edaBtn');
+        this.edaSpinner = document.getElementById('edaSpinner');
+        this.edaGrid = document.getElementById('edaGrid');
+        this.clearBtn = document.getElementById('clearBtn');
+      }
+
+      setupEventListeners() {
+        // File input events
+        this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+        this.uploadArea.addEventListener('click', () => this.fileInput.click());
+        
+        // Drag and drop events
+        this.uploadArea.addEventListener('dragover', (e) => this.handleDragOver(e));
+        this.uploadArea.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+        this.uploadArea.addEventListener('drop', (e) => this.handleDrop(e));
+        
+        // Button events
+        this.uploadBtn.addEventListener('click', () => this.uploadFile());
+        this.edaBtn.addEventListener('click', () => this.runEDA());
+        this.clearBtn.addEventListener('click', () => this.clearResults());
+      }
+
+      handleFileSelect(e) {
+        const file = e.target.files[0];
+        if (file) {
+          this.displayFileInfo(file);
+          this.uploadedFile = file;
+        }
+      }
+
+      handleDragOver(e) {
+        e.preventDefault();
+        this.uploadArea.classList.add('dragover');
+      }
+
+      handleDragLeave(e) {
+        e.preventDefault();
+        this.uploadArea.classList.remove('dragover');
+      }
+
+      handleDrop(e) {
+        e.preventDefault();
+        this.uploadArea.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          this.fileInput.files = e.dataTransfer.files;
+          this.displayFileInfo(file);
+          this.uploadedFile = file;
+        }
+      }
+
+      displayFileInfo(file) {
+        this.fileName.textContent = file.name;
+        this.fileSize.textContent = this.formatFileSize(file.size);
+        this.fileInfo.style.display = 'block';
+        this.uploadBtn.disabled = false;
+      }
+
+      formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      showStatus(message, type) {
+        this.statusMessage.textContent = message;
+        this.statusMessage.className = `status-message status-${type}`;
+        this.statusMessage.style.display = 'block';
+        
+        if (type === 'success') {
+          setTimeout(() => {
+            this.statusMessage.style.display = 'none';
+          }, 3000);
+        }
+      }
+
+      showProgress(show) {
+        this.progressBar.style.display = show ? 'block' : 'none';
+        if (show) {
+          this.progressFill.style.width = '0%';
+          this.animateProgress();
+        }
+      }
+
+      animateProgress() {
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += Math.random() * 15;
+          if (progress >= 90) {
+            clearInterval(interval);
+            return;
+          }
+          this.progressFill.style.width = progress + '%';
+        }, 200);
+      }
+
+      async uploadFile() {
+        if (!this.uploadedFile) {
+          this.showStatus('Please select a file first', 'error');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', this.uploadedFile);
+
+        try {
+          this.uploadBtn.disabled = true;
+          this.showStatus('Uploading file...', 'loading');
+          this.showProgress(true);
+
+          const response = await fetch('http://127.0.0.1:5000/upload', {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+          this.progressFill.style.width = '100%';
+          alert(result.message);
+          if (response.ok) {
+           
+            this.showStatus('File uploaded successfully!', 'success');
+            this.resultsSection.style.display = 'block';
+            this.resultsSection.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            this.showStatus(result.error || 'Upload failed', 'error');
+          }
+        } catch (error) {
+          this.showStatus('Upload error: ' + error.message, 'error');
+        } finally {
+          this.uploadBtn.disabled = false;
+          setTimeout(() => this.showProgress(false), 500);
+        }
+      }
+
+      async runEDA() {
+        try {
+          this.edaBtn.disabled = true;
+          this.edaSpinner.style.display = 'inline-block';
+          this.edaBtn.innerHTML = '<span class="loading-spinner"></span> Analyzing...';
+
+          const response = await fetch('http://127.0.0.1:5000/getEDA');
+          const result = await response.json();
+
+          if (response.ok) {
+            this.edaResults = result;
+            this.displayEDAResults(result);
+            this.showStatus('EDA analysis completed!', 'success');
+          } else {
+            this.showStatus('EDA error: ' + result.error, 'error');
+          }
+        } catch (error) {
+          this.showStatus('Failed to run EDA: ' + error.message, 'error');
+        } finally {
+          this.edaBtn.disabled = false;
+          this.edaSpinner.style.display = 'none';
+          this.edaBtn.innerHTML = 'Run EDA Analysis';
+        }
+      }
+
+      displayEDAResults(eda) {
+        this.edaGrid.innerHTML = '';
+
+        // Dataset Shape
+        const shapeCard = this.createCard('📏 Dataset Shape', 'shape-card');
+        shapeCard.innerHTML += `
+          <div class="card-title">
+            <span class="card-icon">📏</span>
+            Dataset Shape
+          </div>
+          <div class="shape-display">${eda.shape.join(' × ')}</div>
+          <div style="text-align: center; margin-top: 10px; color: #666;">
+            ${eda.shape[0]} rows, ${eda.shape[1]} columns
+          </div>
+        `;
+
+        // Data Types
+        const typesCard = this.createCard('🏷️ Data Types', 'types-card');
+        typesCard.innerHTML += `
+          <div class="card-title">
+            <span class="card-icon">🏷️</span>
+            Data Types
+          </div>
+          <div class="table-container">
+            ${this.createTable(eda.dtypes, ['Column', 'Type'])}
+          </div>
+        `;
+
+        // Missing Values
+        const nullsCard = this.createCard('❌ Missing Values', 'nulls-card');
+        nullsCard.innerHTML += `
+          <div class="card-title">
+            <span class="card-icon">❌</span>
+            Missing Values
+          </div>
+          <div class="table-container">
+            ${this.createTable(eda.null_counts, ['Column', 'Missing Count'])}
+          </div>
+        `;
+
+        // Summary Statistics
+        if (eda.numeric_describe && Object.keys(eda.numeric_describe).length > 0) {
+          const statsCard = this.createCard('📈 Summary Statistics', 'stats-card full-width-card');
+          statsCard.innerHTML += `
+            <div class="card-title">
+              <span class="card-icon">📈</span>
+              Summary Statistics (Numerical Columns)
+            </div>
+            <div class="table-container">
+              ${this.createStatsTable(eda.numeric_describe)}
+            </div>
+          `;
+        }
+
+        // Sample Data
+        const headCard = this.createCard('👀 Sample Data', 'head-card full-width-card');
+        headCard.innerHTML += `
+          <div class="card-title">
+            <span class="card-icon">👀</span>
+            First 5 Rows
+          </div>
+          <div class="table-container">
+            ${this.createHeadTable(eda.head)}
+          </div>
+        `;
+
+        // Scroll to results
+        this.edaGrid.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      createCard(title, className = '') {
+        const card = document.createElement('div');
+        card.className = `eda-card ${className}`;
+        this.edaGrid.appendChild(card);
+        return card;
+      }
+
+      createTable(data, headers) {
+        let html = '<table><thead><tr>';
+        headers.forEach(header => {
+          html += `<th>${header}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+
+        Object.entries(data).forEach(([key, value]) => {
+          html += `<tr><td><strong>${key}</strong></td><td>${value}</td></tr>`;
+        });
+
+        html += '</tbody></table>';
+        return html;
+      }
+
+      createStatsTable(describe) {
+        const columns = Object.keys(describe);
+        const stats = Object.keys(describe[columns[0]] || {});
+        
+        let html = '<table><thead><tr><th>Statistic</th>';
+        columns.forEach(col => {
+          html += `<th>${col}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+
+        stats.forEach(stat => {
+          html += `<tr><td><strong>${stat}</strong></td>`;
+          columns.forEach(col => {
+            const value = describe[col][stat];
+            const formattedValue = typeof value === 'number' ? 
+              value.toLocaleString(undefined, { maximumFractionDigits: 2 }) : value;
+            html += `<td>${formattedValue}</td>`;
+          });
+          html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        return html;
+      }
+
+      createHeadTable(headRows) {
+        if (!headRows || headRows.length === 0) {
+          return '<table><tr><td>No data available</td></tr></table>';
+        }
+
+        const columns = Object.keys(headRows[0]);
+        let html = '<table><thead><tr>';
+        columns.forEach(col => {
+          html += `<th>${col}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+
+        headRows.forEach(row => {
+          html += '<tr>';
+          columns.forEach(col => {
+            html += `<td>${row[col] || ''}</td>`;
+          });
+          html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        return html;
+      }
+
+      clearResults() {
+        this.edaGrid.innerHTML = '';
+        this.resultsSection.style.display = 'none';
+        this.edaResults = null;
+        this.showStatus('Results cleared', 'success');
+      }
+    }
+
+    // Initialize the EDA Analyzer
+    document.addEventListener('DOMContentLoaded', () => {
+      new EDAAnalyzer();
+    });
+  </script>
+</body>
+</html>
